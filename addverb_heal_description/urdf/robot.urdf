@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot
+    name="robot">
+    <link
+        name="world_link" />
+    <joint name="root_joint" type="fixed">
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <parent link="world_link" />
+        <child link="base_link" />
+    </joint>
+    <link
+        name="base_link">
+        <inertial>
+            <origin
+                xyz="-12.54E-03 -0.04E-03 111.27E-03"
+                rpy="0 0 0" />
+            <mass
+                value="0.5" />
+            <inertia
+                ixx="1"
+                ixy="0"
+                ixz="0"
+                iyy="1"
+                iyz="0"
+                izz="1" />
+        </inertial>
+        <visual>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/base_link.STL" />
+            </geometry>
+            <material
+                name="">
+                <color
+                    rgba="0.79216 0.81961 0.93333 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/base_link.STL" />
+            </geometry>
+        </collision>
+    </link>
+    <link
+        name="link1">
+        <inertial>
+            <origin
+                xyz="-12.54E-03 -0.04E-03 111.27E-03"
+                rpy="0 0 0" />
+            <mass
+                value="7.92" />
+            <inertia
+                ixx="1"
+                ixy="0"
+                ixz="0"
+                iyy="1"
+                iyz="0"
+                izz="1" />
+        </inertial>
+        <visual>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/link_1.STL" />
+            </geometry>
+            <material
+                name="">
+                <color
+                    rgba="0.79216 0.81961 0.93333 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/link_1.STL" />
+            </geometry>
+        </collision>
+    </link>
+    <joint
+        name="Joint_1"
+        type="revolute">
+        <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+        <parent
+            link="base_link" />
+        <child
+            link="link1" />
+        <axis
+            xyz="0 0 1" />
+        <limit
+            lower="-3.14"
+            upper="3.14"
+            effort="150"
+            velocity="3" />
+    </joint>
+    <link
+        name="link2">
+        <inertial>
+            <origin
+                xyz="0.01E-03 152.36E-03 15.99E-03"
+                rpy="0 0 0" />
+            <mass
+                value="1.24" />
+            <inertia
+                ixx="1"
+                ixy="0"
+                ixz="0"
+                iyy="1"
+                iyz="0"
+                izz="1" />
+        </inertial>
+        <visual>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/link_2.STL" />
+            </geometry>
+            <material
+                name="">
+                <color
+                    rgba="0.79216 0.81961 0.93333 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/link_2.STL" />
+            </geometry>
+        </collision>
+    </link>
+    <joint
+        name="Joint_2"
+        type="revolute">
+        <origin
+            xyz="0 0 0.346"
+            rpy="0 0 0" />
+        <parent
+            link="link1" />
+        <child
+            link="link2" />
+        <axis
+            xyz="-1 0 0" />
+        <limit
+            lower="-0.75"
+            upper="2.05"
+            effort="150"
+            velocity="1" />
+    </joint>
+    <link
+        name="link3">
+        <inertial>
+            <origin
+                xyz="-33.59E-03 -0.02E-03 -73.25E-03"
+                rpy="0 0 0" />
+            <mass
+                value="5.57" />
+            <inertia
+                ixx="1"
+                ixy="0"
+                ixz="0"
+                iyy="1"
+                iyz="0"
+                izz="1" />
+        </inertial>
+        <visual>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/link_3.STL" />
+            </geometry>
+            <material
+                name="">
+                <color
+                    rgba="0.79216 0.81961 0.93333 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/link_3.STL" />
+            </geometry>
+        </collision>
+    </link>
+    <joint
+        name="Joint_3"
+        type="revolute">
+        <origin
+            xyz="0 0 0.305"
+            rpy="0 0 0" />
+        <parent
+            link="link2" />
+        <child
+            link="link3" />
+        <axis
+            xyz="1 0 0" />
+        <limit
+            lower="-1"
+            upper="1"
+            effort="150"
+            velocity="5" />
+    </joint>
+    <link
+        name="link4">
+        <inertial>
+            <origin
+                xyz="50.59E-03 0.06E-03 106.42E-03"
+                rpy="0 0 0" />
+            <mass
+                value="1.9" />
+            <inertia
+                ixx="1"
+                ixy="0"
+                ixz="0"
+                iyy="1"
+                iyz="0"
+                izz="1" />
+        </inertial>
+        <visual>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/link_4.STL" />
+            </geometry>
+            <material
+                name="">
+                <color
+                    rgba="0.79216 0.81961 0.93333 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/link_4.STL" />
+            </geometry>
+        </collision>
+    </link>
+    <joint
+        name="Joint_4"
+        type="revolute">
+        <origin
+            xyz="-0.0009127 0.36813 0"
+            rpy="0 0 0" />
+        <parent
+            link="link3" />
+        <child
+            link="link4" />
+        <axis
+            xyz="0 1 0" />
+        <limit
+            lower="-3.14"
+            upper="3.14"
+            effort="80"
+            velocity="1" />
+    </joint>
+    <link
+        name="link5">
+        <inertial>
+            <origin
+                xyz="-0.02E-03 -46.18E-03 58.09E-03"
+                rpy="0 0 0" />
+            <mass
+                value="1.78" />
+            <inertia
+                ixx="1"
+                ixy="0"
+                ixz="0"
+                iyy="1"
+                iyz="0"
+                izz="1" />
+        </inertial>
+        <visual>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/link_5.STL" />
+            </geometry>
+            <material
+                name="">
+                <color
+                    rgba="0.79216 0.81961 0.93333 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/link_5.STL" />
+            </geometry>
+        </collision>
+    </link>
+    <joint
+        name="Joint_5"
+        type="revolute">
+        <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+        <parent
+            link="link4" />
+        <child
+            link="link5" />
+        <axis
+            xyz="0.5 0.86603 0" />
+        <limit
+            lower="-3.14"
+            upper="3.14"
+            effort="80"
+            velocity="1" />
+    </joint>
+    <link
+        name="tool">
+        <inertial>
+            <origin
+                xyz="0 0 0.0"
+                rpy="0 0 0" />
+            <mass
+                value="0.01" />
+            <inertia
+                ixx="1"
+                ixy="0"
+                ixz="0"
+                iyy="1"
+                iyz="0"
+                izz="1" />
+        </inertial>
+        <visual>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/end_effector.STL" />
+            </geometry>
+            <material
+                name="">
+                <color
+                    rgba="0.89804 0.91765 0.92941 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/end_effector.STL" />
+            </geometry>
+        </collision>
+    </link>
+    <joint
+        name="Joint_6"
+        type="revolute">
+        <origin
+            xyz="0 0 -0.0975"
+            rpy="0 0 0" />
+        <parent
+            link="link5" />
+        <child
+            link="tool" />
+        <axis
+            xyz="0 0 -1" />
+        <limit
+            lower="-3.14"
+            upper="3.14"
+            effort="80"
+            velocity="1" />
+    </joint>
+
+    <!-- DUMMY FIXED JOINT AT END -->
+    <link
+        name="tool_ff">
+        <inertial>
+            <origin
+                xyz="0 0 0.0"
+                rpy="0 0 0" />
+            <mass
+                value="0.01" />
+            <inertia
+                ixx="1"
+                ixy="0"
+                ixz="0"
+                iyy="1"
+                iyz="0"
+                izz="1" />
+        </inertial>
+        <visual>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/end_effector.STL" />
+            </geometry>
+            <material
+                name="">
+                <color
+                    rgba="0.89804 0.91765 0.92941 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin
+                xyz="0 0 0"
+                rpy="0 0 0" />
+            <geometry>
+                <mesh
+                    filename="package://addverb_heal_description/mesh/end_effector.STL" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="tool_joint_ff" type="fixed">
+        <origin rpy="0 0 0" xyz="0 0 0" />
+        <parent link="tool" />
+        <child link="tool_ff" />
+    </joint>
+</robot>

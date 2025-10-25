@@ -1,0 +1,36 @@
+<launch>
+  <!-- 1) Start Gazebo with an (optional) empty or custom world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <!-- If you have a custom .world, uncomment and set path:
+    <arg name="world_name" value="$(find YOUR_PACKAGE)/worlds/my_world.world"/> -->
+
+    <!-- We use simulated time so that ROS uses the clock from Gazebo -->
+    <arg name="use_sim_time" value="true"/>
+    <arg name="paused" value="false"/>
+    <arg name="gui" value="true"/>
+  </include>
+
+  <!-- 2) Load the URDF into parameter server -->
+  <param name="robot_description" command="cat $(find addverb_cobot_description)/urdf/robot.urdf" />
+
+  <!-- 3) Spawn the robot in Gazebo using the robot_description -->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="screen"
+        args="-param robot_description 
+              -model addverb_cobot
+              -x 0 -y 0 -z 1" />
+
+  <!-- 4) Load your controller configurations -->
+  <rosparam file="$(find addverb_cobot_control)/config/default_controllers.yaml" command="load" />
+  <rosparam file="$(find addverb_cobot_control)/config/payload_param.yaml" command="load" />
+
+  <!-- 5) Spawn controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+        args="joint_state_controller 
+              effort_controller 
+              twist_controller 
+              joint_trajectory_controller" />
+
+  <!-- 6) Your control node -->
+  <node name="control_node" pkg="addverb_cobot_control" type="control_node"
+        required="true" respawn="false" output="screen" />
+</launch>

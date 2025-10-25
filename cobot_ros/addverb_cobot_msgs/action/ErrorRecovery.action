@@ -1,0 +1,12 @@
+# no data type to send for goal
+---
+#result 
+int32 state
+int32 error_code
+string error_msg
+
+---
+#feedback
+int32 state
+int32 error_code
+string error_msg

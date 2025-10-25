@@ -1,0 +1,37 @@
+<launch>
+  <!-- Argument for the RViz config file -->
+  <arg name="rviz_config" default="$(find addverb_cobot_description)/config/dual_arm.config.rviz" />
+
+  <!-- Include the RealSense camera launch file -->
+  <include ns="/" file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <arg name="enable_color" value="true" />
+    <arg name="enable_depth" value="true" />
+    <arg name="enable_infra1" value="true" />
+    <arg name="enable_infra2" value="true" />
+    <arg name="initial_reset" value="true" />
+  </include>
+
+  <!-- Apply a 180-degree rotation to the camera -->
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="camera_rotation"
+        args="0 0 0 0 0 1 0 camera_link camera_link_rotated" /> -->
+
+  <!-- Publish a static transform: robotB/base_link w.r.t. robotA/base_link -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="robotA_to_robotB_broadcaster"
+        args="-1.68 0 -0.02 0 0 0 1 robotB/base_link robotA/base_link" />
+
+  <!-- Publish a static transform: robotB/base_link to a uniquely named static frame -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="camera_link_broadcaster"
+        args="-0.90081 2.06259 0.384524 0.715912 0.0191383 -0.0217796 0.697588 robotB/base_link camera_static_optical_frame" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="optical_link_broadcaster"
+      args="0 0 0 0 0 0 1 camera_static_optical_frame camera_optical_frame" />
+
+  <node pkg="aruco" type="aruco_tracking.py" name="aruco_tracker_node" output="screen">
+    <!-- Pass any required parameters -->
+    <param name="camera_topic" value="/camera/color/image_raw" />
+    <param name="marker_side_length" value="0.098" />
+  </node>
+
+  <!-- Launch RViz with the specified config -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_config)" />
+</launch>

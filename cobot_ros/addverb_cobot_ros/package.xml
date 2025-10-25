@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>addverb_cobot_ros</name>
+  <version>0.0.1</version>
+  <description>This package contains the sub-pakcages for operating the robot via ROS</description>
+
+  <maintainer email="siddhi.jain@addverb.com">Yaswanth Gonna</maintainer> 
+  <maintainer email="yaswanth.gonna@addverb.com">Yaswanth Gonna</maintainer>
+  <license>TODO</license>
+  <author>Siddhi Jain</author>
+  <author>Yaswanth Gonna</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>addverb_cobot_control</exec_depend>
+  <exec_depend>addverb_cobot_description</exec_depend>
+  <exec_depend>addverb_cobot_msgs</exec_depend>
+  <exec_depend>examples</exec_depend>
+
+
+  <export>
+    <metapackage/>
+  </export>
+</package>

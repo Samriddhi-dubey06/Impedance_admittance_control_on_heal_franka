@@ -1,0 +1,156 @@
+# joint_limits:
+#   Joint_1:
+#     has_position_limits: true
+#     min_position: 3.14
+#     max_position: -3.14
+#     has_velocity_limits: true
+#     max_velocity: 0.18
+#     has_acceleration_limits: true
+#     max_acceleration: 40
+#     has_effort_limits: true
+#     max_effort: 40.0
+#     soft_lower_limit: 3
+#     soft_upper_limit: -3
+#     k_position: 10.0
+#     k_velocity: 10.0
+
+#   Joint_2:
+#     has_position_limits: true
+#     min_position: 1.57
+#     max_position: -3.14
+#     has_velocity_limits: true
+#     max_velocity: 0.18
+#     has_acceleration_limits: true
+#     max_acceleration: 40.0
+#     has_effort_limits: true
+#     max_effort: 40.0
+#     soft_lower_limit: 1.5
+#     soft_upper_limit: -3
+#     k_position: 10.0
+#     k_velocity: 10.0
+
+#   Joint_3:
+#     has_position_limits: true
+#     min_position: 1.57
+#     max_position: -0.68
+#     has_velocity_limits: true
+#     max_velocity: 0.18
+#     has_acceleration_limits: true
+#     max_acceleration: 40
+#     has_effort_limits: true
+#     max_effort: 40.0
+#     soft_lower_limit: 1.5
+#     soft_upper_limit: -0.6
+#     k_position: 10.0
+#     k_velocity: 10.0
+
+
+#   Joint_4:
+#     has_position_limits: true
+#     min_position: 3.14
+#     max_position: -3.14
+#     has_velocity_limits: true
+#     max_velocity: 0.18
+#     has_acceleration_limits: true
+#     max_acceleration: 10
+#     has_effort_limits: true
+#     max_effort: 10.0
+#     soft_lower_limit: 3
+#     soft_upper_limit: -3
+#     k_position: 10.0
+#     k_velocity: 10.0
+
+#   Joint_5:
+#     has_position_limits: true
+#     min_position: 3.14
+#     max_position: -3.14
+#     has_velocity_limits: true
+#     max_velocity: 0.18
+#     has_acceleration_limits: true
+#     max_acceleration: 10
+#     has_effort_limits: true
+#     max_effort: 10.0
+#     soft_lower_limit: 3
+#     soft_upper_limit: 3
+#     k_position: 10.0
+#     k_velocity: 10.0
+
+#   Joint_6:
+#     has_position_limits: true
+#     min_position: 3.14
+#     max_position: -3.14
+#     has_velocity_limits: true
+#     max_velocity: 0.18
+#     has_acceleration_limits: true
+#     max_acceleration: 10
+#     has_effort_limits: true
+#     max_effort: 10.0
+#     soft_lower_limit: 3
+#     soft_upper_limit: 3
+#     k_position: 10.0
+#     k_velocity: 10.0
+
+# Publish all joint states ----------------------------------
+# Creates the /joint_states topic necessary in ROS
+joint_state_controller:
+   type: joint_state_controller/JointStateController
+   publish_rate: 50
+
+# For detailed explanations of parameter see http://wiki.ros.org/joint_trajectory_controller
+velocity_controller:
+   type: velocity_controllers/JointGroupVelocityController
+   # These joints can likely just be copied from the hardware_interface list above
+   joints:
+      - Joint_1
+      - Joint_2
+      - Joint_3
+      - Joint_4
+      - Joint_5
+      - Joint_6
+
+# For detailed explanations of parameter see http://wiki.ros.org/joint_trajectory_controller
+effort_controller:
+   type: effort_controllers/JointGroupEffortController
+   # These joints can likely just be copied from the hardware_interface list above
+   joints:
+      - Joint_1
+      - Joint_2
+      - Joint_3
+      - Joint_4
+      - Joint_5
+      - Joint_6
+
+# Joint Trajectory Controller -------------------------------
+joint_trajectory_controller:
+   type: joint_trajectory_controller/addverb_cobot_controllers
+   # These joints can likely just be copied from the hardware_interface list above
+   joints:
+      - Joint_1
+      - Joint_2
+      - Joint_3
+      - Joint_4
+      - Joint_5
+      - Joint_6
+   
+
+twist_controller:
+   type: twist_controller/addverb_cobot_controllers
+
+   joints:
+      - Joint_1
+      - Joint_2
+      - Joint_3
+      - Joint_4
+      - Joint_5
+      - Joint_6
+   frame_id: end_effector
+
+# possible values : s
+# 1. velocity (DEFAULT MODE) : control each joint by publishing velocity commands 
+# 2. twist : control linear/angular motion of end-effector by publishing twist commands 
+# 3. joint_trajectory : control motion of robot by publishing trajectory commands 
+ros_control_mode: velocity
+
+
+
+

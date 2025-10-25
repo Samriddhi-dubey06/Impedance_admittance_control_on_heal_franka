@@ -1,0 +1,17 @@
+<library path="lib/libaddverb_cobot_controllers">
+  <class name="twist_controller/addverb_cobot_controllers"
+         type="addverb::TwistController"
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+      The controller which recieves twist command and send to twist command interface
+    </description>
+  </class>
+
+  <class name="joint_trajectory_controller/addverb_cobot_controllers"
+         type="addverb::JointTrajectoryController"
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+      The controller which recieves joint trajectory command and sends joint trajectory command directly to hardware_interface
+    </description>
+  </class>
+</library>

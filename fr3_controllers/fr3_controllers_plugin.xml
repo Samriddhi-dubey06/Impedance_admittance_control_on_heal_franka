@@ -1,0 +1,64 @@
+<library path="lib/libfr3_controllers">
+  <class name="fr3_controllers/EOIController" 
+         type="fr3_controllers::EOIController" 
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+      EOI Controller
+    </description>
+  </class>
+
+  <class name="fr3_controllers/CartesianPoseController" 
+         type="fr3_controllers::CartesianPoseController" 
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+    </description>
+  </class>
+
+  <class name="fr3_controllers/JointPositionController"
+         type="fr3_controllers::JointPositionController"
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+      Joint position controller for Franka
+    </description>
+  </class>
+
+  <class name="fr3_controllers/JointVelocityController" 
+         type="fr3_controllers::JointVelocityController" 
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+      A joint velocity controller that receives joint velocity commands via ROS topic and applies them to the Franka robot in real time.
+    </description>
+  </class>
+
+  <class name="fr3_controllers/VIC" 
+         type="fr3_controllers::VIC" 
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+      A joint velocity controller that receives joint velocity commands via ROS topic and applies them to the Franka robot in real time.
+    </description>
+  </class>
+
+  <class name="fr3_controllers/CartesianImpedanceController" 
+         type="fr3_controllers::CartesianImpedanceController" 
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+     Cartesian Impedance ontroller
+    </description>
+  </class>
+
+  <class name="fr3_controllers/JointImpedanceController" 
+         type="fr3_controllers::JointImpedanceController" 
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+     Joint Impedance Controller
+    </description>
+  </class>
+
+  <class name="fr3_controllers/DOB" 
+         type="fr3_controllers::DOB" 
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+    </description>
+  </class>
+
+</library>

@@ -1,0 +1,538 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import rospy
+from std_msgs.msg import Float64MultiArray
+from sensor_msgs.msg import JointState
+from franka_msgs.msg import FrankaState
+from geometry_msgs.msg import WrenchStamped  
+from geometry_msgs.msg import TwistStamped
+import csv
+import sys
+sys.path.insert(0, '/home/iitgn-robotics/ds_yash/bimanual_ws/src')
+# Import your existing KDL wrapper that lives in the same utils/ folder
+from .jacobian_franka import FrankaKDL
+
+
+# ======================= Default Config (override via kwargs) =======================
+DEFAULTS = dict(
+    urdf="/home/iitgn-robotics/ds_yash/bimanual_ws/src/addverb_heal_description/urdf/fr3.urdf",
+    base="fr3_link0",
+    tip="fr3_link8",
+    joint_names=[
+        "fr3_joint1","fr3_joint2","fr3_joint3",
+        "fr3_joint4","fr3_joint5","fr3_joint6","fr3_joint7"
+    ],
+    topic_state="/fr3/franka_state_controller/franka_states",
+    topic_wrench="/fr3/wrench_filtered",
+    topic_joints="/fr3/joint_states",
+    topic_command="/fr3/joint_velocity_controller/joint_velocity_command",
+    lambda_star=np.array([0.0, -7.0, 0.0, 0.0, 0.0, 0.0], dtype=float),  # Fy target
+    k_vec=np.array([1.0, 0.2, 1.0, 0.1, 0.1, 0.1], dtype=float),
+    max_joint_vel=0.1,  # rad/s
+    deadband=0.01,       # |error| threshold
+    # add these inside DEFAULTS
+    mu_min=0.5,      # <- pick conservative friction
+    rho=0.8,         # <- 20% safety margin
+    delta=0.1,       # <- noise bias (N)
+    kappa=0.20,      # <- drop threshold (20%)
+    f_n_max=20.0,    # <- actuator/comfort limit (N)
+)
+
+
+class FrankaController:
+    """
+    Minimal Franka velocity controller using FrankaKDL and a force error on Fy.
+    Construct with defaults or override any field in DEFAULTS via kwargs.
+    """
+
+    def __init__(self, **kwargs):
+        cfg = {**DEFAULTS, **kwargs}
+        self.urdf = cfg['urdf']
+        self.base = cfg['base']
+        self.tip = cfg['tip']
+        self.joint_names = cfg['joint_names']
+        # self.topic_state = cfg['topic_state']
+        self.topic_joints = cfg['topic_joints']
+        self.topic_wrench = cfg['topic_wrench']
+        self.topic_command = cfg['topic_command']
+        self.lambda_star = cfg['lambda_star'].astype(float)
+        self.k_vec = cfg['k_vec'].astype(float)
+        self.max_joint_vel = float(cfg['max_joint_vel'])
+        self.deadband = float(cfg['deadband'])
+        # inside __init__ after existing cfg pulls
+        self.mu_min  = float(cfg['mu_min'])
+        self.rho     = float(cfg['rho'])
+        self.delta   = float(cfg['delta'])
+        self.kappa   = float(cfg['kappa'])
+        self.f_n_max = float(cfg['f_n_max'])
+        self.have_wrench = False
+
+        
+        # ---- Contact gating & thresholds ----
+        self.contact_thresh = float(rospy.get_param("~contact_thresh", 2.0))  # |Fy| above this = contact (N)
+        self.contact_required_hits = int(rospy.get_param("~contact_hits", 3)) # debounce: consecutive hits
+        self.shear_thresh = float(rospy.get_param("~shear_thresh", 1.0))      # require tangential > this (N)
+
+        self.in_contact = False
+        self._contact_hits = 0
+
+        # Warm-start the drop-guard memory so it doesn't inflate at t=0
+        self.f_n_cmd_prev = (1.0 - self.kappa) * abs(self.lambda_star[1])  # was: abs(self.lambda_star[1])
+        
+        # === CSV setup (final lam_star + measured FT) ===
+        csv_dir = "/home/iitgn-robotics/ds_yash/bimanual_ws/src/dynamic_box_lifting/csv/franka_logs"
+        os.makedirs(csv_dir, exist_ok=True)
+
+        self.csv_file_final = os.path.join(csv_dir, "franka_final_and_ft.csv")
+
+        if not os.path.isfile(self.csv_file_final):
+            with open(self.csv_file_final, "w", newline="") as f:
+                import csv
+                writer = csv.writer(f)
+                writer.writerow([
+                    "time",
+                    "lam_star_Fx", "lam_star_Fy", "lam_star_Fz",
+                    "lam_star_Tx", "lam_star_Ty", "lam_star_Tz",
+                    "Fx_meas", "Fy_meas", "Fz_meas", "Tx_meas", "Ty_meas", "Tz_meas"
+                ])
+
+        # throttle ~20 Hz
+        self.log_hz = 20.0
+        self.log_dt = 1.0 / self.log_hz
+        self.last_log_t = None
+
+
+        # State
+        self.f_left = np.zeros(6, dtype=float)  # O_F_ext_hat_K (base-frame external wrench)
+        self.joint_positions = None             # np.array, size = 7
+        self.n_joints = 7
+        self.obj_vel_x = 0.0
+
+        # KDL init via your wrapper
+        self.franka_kdl = FrankaKDL(
+            urdf_file=self.urdf,
+            base_link=self.base,
+            tip_link=self.tip,
+            joint_names=self.joint_names
+        )
+
+        # ROS I/O
+        # rospy.Subscriber(self.topic_state,  FrankaState, self._franka_state_cb, queue_size=1)
+        rospy.Subscriber(self.topic_wrench, WrenchStamped, self._wrench_cb, queue_size=1)
+        rospy.Subscriber(self.topic_joints, JointState,   self._joint_cb,       queue_size=1)
+        rospy.Subscriber("/object_velocity_cmd", TwistStamped, self._obj_vel_cb, queue_size=1)
+
+        self.pub = rospy.Publisher(self.topic_command, Float64MultiArray, queue_size=1)
+
+    # -------------------- Callbacks --------------------
+    def _franka_state_cb(self, msg: FrankaState):
+        try:
+            meas = np.array(list(msg.O_F_ext_hat_K), dtype=float)  # [Fx,Fy,Fz,Tx,Ty,Tz]
+            self.f_left = meas
+        except Exception as e:
+            rospy.logwarn_throttle(2.0, f"[FR3] Failed to parse O_F_ext_hat_K: {e}")
+            
+            
+    def _wrench_cb(self, msg: WrenchStamped):
+        # msg.wrench.force.{x,y,z}, msg.wrench.torque.{x,y,z}
+        fx = msg.wrench.force.x
+        fy = msg.wrench.force.y
+        fz = msg.wrench.force.z
+        tx = msg.wrench.torque.x
+        ty = msg.wrench.torque.y
+        tz = msg.wrench.torque.z
+        self.f_left = np.array([fx, fy, fz, tx, ty, tz], dtype=float)
+        self.have_wrench = True 
+
+
+    def _joint_cb(self, msg: JointState):
+        name_to_pos = {n: p for n, p in zip(msg.name, msg.position)}
+        name_to_vel = {n: v for n, v in zip(msg.name, msg.velocity)}
+        try:
+            self.joint_positions = np.array([name_to_pos[j] for j in self.joint_names], dtype=float)
+            self.joint_velocities = np.array([name_to_vel[j] for j in self.joint_names], dtype=float)
+
+        except KeyError:
+            pass
+        
+    def _obj_vel_cb(self, msg: TwistStamped):
+        """Store only the linear.x component from /object_velocity_cmd"""
+        self.obj_vel_x = msg.twist.linear.x
+        rospy.logdebug_throttle(1.0, f"[FR3] Received object vx = {self.obj_vel_x:.3f}")
+
+    # -------------------- Control Step -----------------
+    def step(self):
+        if not self.have_wrench:
+            return
+        """One control tick; Fy-only control with damping."""
+        lam_meas = self.f_left.copy()
+        lam_star = self.lambda_star.copy()
+        # ---- Margin rule on normal (Fy) ----
+        # ---- Margin rule on normal (Fy) with contact gating ----
+        f_n_base = abs(lam_star[1])
+        f_n_meas = abs(lam_meas[1])
+        f_t_meas = np.hypot(lam_meas[0], lam_meas[2])   # tangential = sqrt(Fx^2 + Fz^2)
+
+        # contact debounce
+        if f_n_meas > self.contact_thresh:
+            self._contact_hits += 1
+        else:
+            self._contact_hits = 0
+        self.in_contact = (self._contact_hits >= self.contact_required_hits)
+
+        # start with base target
+        f_n_des = f_n_base
+
+        if self.in_contact:
+            # only raise normal if appreciable shear exists
+            if f_t_meas > self.shear_thresh:
+                f_n_req = (f_t_meas + self.delta) / (self.mu_min * self.rho)
+                f_n_des = max(f_n_des, f_n_req)
+
+            # drop-guard only after contact is confirmed
+            if f_n_meas < (1.0 - self.kappa) * self.f_n_cmd_prev:
+                f_n_des = max(f_n_des, self.f_n_cmd_prev / (1.0 - self.kappa))
+
+        # saturate & compute increment
+        f_n_des = min(f_n_des, self.f_n_max)
+        delta_f_n = max(0.0, f_n_des - f_n_base)
+
+
+        # write back into lam_star[1] with original sign
+        sgn_n = -1.0 if self.lambda_star[1] < 0.0 else 1.0
+        lam_star[1] = sgn_n * (f_n_base + delta_f_n)
+        lam_star_final = lam_star.copy() 
+        
+        # === Log final lam_star + measured FT at ~20 Hz ===
+        t_now = rospy.Time.now().to_sec()
+        if (self.last_log_t is None) or (t_now - self.last_log_t >= self.log_dt):
+            with open(self.csv_file_final, "a", newline="") as f:
+                import csv
+                writer = csv.writer(f)
+                writer.writerow([
+                    t_now,
+                    lam_star_final[0], lam_star_final[1], lam_star_final[2],
+                    lam_star_final[3], lam_star_final[4], lam_star_final[5],
+                    self.f_left[0], self.f_left[1], self.f_left[2],
+                    self.f_left[3], self.f_left[4], self.f_left[5]
+                ])
+            self.last_log_t = t_now
+
+        
+        q_dot = np.zeros(self.n_joints, dtype=float)
+
+        if self.joint_positions is not None and len(self.joint_positions) == self.n_joints:
+            try:
+                # Compute Jacobian and end-effector velocity
+                J = self.franka_kdl.compute_jacobian(self.joint_positions)  # 6x7
+                v_ee = J @ self.joint_velocities   # 6x1
+
+                # Force error (only Fy active)
+                force_error = lam_star_final- lam_meas
+                force_error[0] = 0.0   # no Fx
+                force_error[2] = 0.0   # no Fz
+                force_error[3:6] = 0.0 # no torques
+
+
+                # if abs(force_error[1]) >= self.deadband:
+                v_force = (0.001 * force_error) / self.k_vec 
+                    # NEW: object velocity contribution
+                v_obj = np.zeros(6)
+                v_obj[2] = self.obj_vel_x   # linear.x only 
+                    # Final control twist
+                    # copy so you don’t overwrite the raw v_obj
+                v_obj_scaled = v_obj.copy()
+
+                    # scale only the lifting direction (z, index 2)
+                lift_scale = 0.2   # e.g. 20% of original speed
+                v_obj_scaled[2] *= lift_scale
+
+                    # combine
+                v_c =  v_obj_scaled
+                v_final = v_force 
+
+                    
+                q_dot = np.clip(np.linalg.pinv(J) @ v_final,
+                                    -self.max_joint_vel, self.max_joint_vel)
+            except Exception as e:
+                rospy.logwarn_throttle(1.0, f"[FR3] Jacobian/command error: {e}")
+                q_dot = np.zeros(self.n_joints, dtype=float)
+
+        self.pub.publish(Float64MultiArray(data=q_dot.tolist()))
+        self.f_n_cmd_prev = abs(lam_star_final[1])
+
+
+
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import os
+import numpy as np
+import rospy
+from std_msgs.msg import Float64MultiArray
+from sensor_msgs.msg import JointState
+from geometry_msgs.msg import WrenchStamped
+from geometry_msgs.msg import TwistStamped
+# ---- KDL for HEAL ----
+import kdl_parser_py.urdf as kdl_urdf
+from PyKDL import ChainJntToJacSolver, JntArray, Jacobian
+import os
+import csv
+
+
+
+# ======================= Default Config (override via kwargs) =======================
+DEFAULTS = dict(
+    urdf='/home/iitgn-robotics/Samriddhi_WS/bimanual_ws/src/addverb_heal_description/urdf/robot.urdf',
+    base_link='base_link',
+    tip_link='tool',
+    topic_ft='/ft_sensor',
+    topic_joints='/heal/joint_states',
+    topic_command='/heal/velocity_controller/command',
+    lambda_star=np.array([-7.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=float),
+    k_vec=np.array([1.0, 0.2, 1.0, 0.1, 0.1, 0.1], dtype=float),
+    max_joint_vel=0.1,  # rad/s
+    deadband=0.01,       # |error| threshold
+    mu_min=0.5,         # conservative friction
+    rho=0.8,            # 20% safety margin
+    delta=0.3,          # noise bias (N)
+    kappa=0.20,         # drop threshold (20%)
+    f_n_max=20.0,       # actuator/comfort limit (N)
+)
+
+
+def _kdl_jacobian(chain, solver, q):
+    """Extract a 6xN Jacobian from KDL."""
+    n = chain.getNrOfJoints()
+    ja = JntArray(n)
+    for i in range(n):
+        ja[i] = q[i]
+    J_kdl = Jacobian(n)
+    solver.JntToJac(ja, J_kdl)
+    J = np.zeros((6, n))
+    for r in range(6):
+        for c in range(n):
+            J[r, c] = J_kdl[r, c]
+    return J
+
+
+class HealController:
+    """
+    Minimal HEAL velocity controller using KDL and a force error on Fx.
+    Construct with defaults or override any field in DEFAULTS via kwargs.
+    """
+
+    def __init__(self, **kwargs):
+        cfg = {**DEFAULTS, **kwargs}
+        self.urdf = cfg['urdf']
+        self.base_link = cfg['base_link']
+        self.tip_link = cfg['tip_link']
+        self.topic_ft = cfg['topic_ft']
+        self.topic_joints = cfg['topic_joints']
+        self.topic_command = cfg['topic_command']
+        self.lambda_star = cfg['lambda_star'].astype(float)
+        self.k_vec = cfg['k_vec'].astype(float)
+        self.max_joint_vel = float(cfg['max_joint_vel'])
+        self.deadband = float(cfg['deadband'])
+        self.mu_min  = float(cfg['mu_min'])
+        self.rho     = float(cfg['rho'])
+        self.delta   = float(cfg['delta'])
+        self.kappa   = float(cfg['kappa'])
+        self.f_n_max = float(cfg['f_n_max'])
+        self.have_wrench = False
+        
+        # ---- Contact gating & thresholds ----
+        self.contact_thresh = float(rospy.get_param("~contact_thresh", 2.0))  # |Fy| above this = contact (N)
+        self.contact_required_hits = int(rospy.get_param("~contact_hits", 3)) # debounce: consecutive hits
+        self.shear_thresh = float(rospy.get_param("~shear_thresh", 1.0))      # require tangential > this (N)
+
+        self.in_contact = False
+        self._contact_hits = 0
+
+        # Warm-start the drop-guard memory so it doesn't inflate at t=0
+        self.f_n_cmd_prev = (1.0 - self.kappa) * abs(self.lambda_star[0])  # was: abs(self.lambda_star[1])
+        
+        # === CSV setup (final lam_star + measured FT) ===
+        csv_dir = "/home/iitgn-robotics/ds_yash/bimanual_ws/src/dynamic_box_lifting/csv/heal_logs"
+        os.makedirs(csv_dir, exist_ok=True)
+
+        # final setpoint + FT (one file)
+        self.csv_file_final = os.path.join(csv_dir, "heal_final_and_ft.csv")
+
+        if not os.path.isfile(self.csv_file_final):
+            with open(self.csv_file_final, "w", newline="") as f:
+                writer = csv.writer(f)
+                writer.writerow([
+                    "time",
+                    "lam_star_Fx", "lam_star_Fy", "lam_star_Fz",
+                    "lam_star_Tx", "lam_star_Ty", "lam_star_Tz",
+                    "Fx_meas", "Fy_meas", "Fz_meas", "Tx_meas", "Ty_meas", "Tz_meas"
+                ])
+
+        # optional: throttle to ~20 Hz
+        self.log_hz = 20.0
+        self.log_dt = 1.0 / self.log_hz
+        self.last_log_t = None
+
+
+        # State
+        self.f_left = np.zeros(6, dtype=float)   # measured wrench
+        self.joint_positions = None  
+        self.obj_vel_x = 0.0
+
+        # Parse URDF & KDL init
+        if not os.path.isfile(self.urdf):
+            rospy.logerr(f'[HEAL] URDF not found: {self.urdf}')
+            self.chain = None
+            self.jac_solver = None
+            self.n = 0
+        else:
+            ok, tree = kdl_urdf.treeFromFile(self.urdf)
+            if not ok:
+                rospy.logerr('[HEAL] Failed to parse URDF')
+                self.chain = None
+                self.jac_solver = None
+                self.n = 0
+            else:
+                self.chain = tree.getChain(self.base_link, self.tip_link)
+                self.jac_solver = ChainJntToJacSolver(self.chain)
+                self.n = self.chain.getNrOfJoints()
+                rospy.loginfo(f'[HEAL] KDL chain initialized with {self.n} joints')
+
+        # ROS I/O
+        rospy.Subscriber(self.topic_ft, WrenchStamped, self._ft_callback, queue_size=1)
+        rospy.Subscriber(self.topic_joints, JointState, self._joint_cb, queue_size=1)
+        rospy.Subscriber("/object_velocity_cmd", TwistStamped, self._obj_vel_cb, queue_size=1)
+        self.pub = rospy.Publisher(self.topic_command, Float64MultiArray, queue_size=1)
+
+    # -------------------- Callbacks --------------------
+    def _ft_callback(self, msg: WrenchStamped):
+        # Take full wrench in sensor frame
+        fx_s = msg.wrench.force.x
+        fy_s = msg.wrench.force.y
+        fz_s = msg.wrench.force.z
+        tx_s = msg.wrench.torque.x
+        ty_s = msg.wrench.torque.y
+        tz_s = msg.wrench.torque.z
+        # Map sensor Z → robot X, and keep others as-is
+        fx = fz_s       # robot X = sensor Z
+        fy = fy_s       # robot Y = sensor Y
+        fz = fx_s       # robot Z = sensor X (if you need it, otherwise 0.0)
+        self.f_left = np.array([fx, fy, fz, tx_s, ty_s, tz_s], dtype=float)
+        self.have_wrench = True
+
+
+    def _joint_cb(self, msg: JointState):
+        if len(msg.position) >= 6:
+            self.joint_positions = np.array(msg.position[:6], dtype=float)
+            
+    def _obj_vel_cb(self, msg: TwistStamped):
+        """Store only the linear.x component from /object_velocity_cmd"""
+        self.obj_vel_x = msg.twist.linear.x
+        rospy.logdebug_throttle(1.0, f"[FR3] Received object vx = {self.obj_vel_x:.3f}")
+
+
+    # -------------------- Control Step -----------------
+    def step(self):
+        """One control tick; Fx-only control."""
+        if self.chain is None or self.jac_solver is None:
+            return  # KDL not ready
+        if not self.have_wrench:
+            return
+
+        lam_meas = self.f_left.copy()
+        lam_star = self.lambda_star.copy()
+        # ---- Margin rule on normal (Fx) ----
+        f_n_base = abs(lam_star[0])
+        # measured normal (Fx after mapping) and tangential (Fy, Fz)
+        f_n_meas = abs(lam_meas[0])
+        f_t_meas = np.hypot(lam_meas[1], lam_meas[2])
+
+        # contact debounce
+        if f_n_meas > self.contact_thresh:
+            self._contact_hits += 1
+        else:
+            self._contact_hits = 0
+        self.in_contact = (self._contact_hits >= self.contact_required_hits)
+
+        # start with base target
+        f_n_des = f_n_base
+
+        if self.in_contact:
+            # only raise normal if appreciable shear exists
+            if f_t_meas > self.shear_thresh:
+                f_n_req = (f_t_meas + self.delta) / (self.mu_min * self.rho)
+                f_n_des = max(f_n_des, f_n_req)
+
+            # drop-guard only after contact is confirmed
+            if f_n_meas < (1.0 - self.kappa) * self.f_n_cmd_prev:
+                f_n_des = max(f_n_des, self.f_n_cmd_prev / (1.0 - self.kappa))
+
+        # saturate & compute increment
+        f_n_des = min(f_n_des, self.f_n_max)
+        delta_f_n = max(0.0, f_n_des - f_n_base)
+
+
+        # write back into lam_star[1] with original sign
+        sgn_n = -1.0 if self.lambda_star[0] < 0.0 else 1.0
+        lam_star[0] = sgn_n * (f_n_base + delta_f_n)
+        lam_star_final = lam_star.copy() 
+        
+        # === Log final lam_star + measured FT at ~20 Hz ===
+        t_now = rospy.Time.now().to_sec()
+        if (self.last_log_t is None) or (t_now - self.last_log_t >= self.log_dt):
+            with open(self.csv_file_final, "a", newline="") as f:
+                writer = csv.writer(f)
+                writer.writerow([
+                    t_now,
+                    lam_star_final[0], lam_star_final[1], lam_star_final[2],
+                    lam_star_final[3], lam_star_final[4], lam_star_final[5],
+                    self.f_left[0], self.f_left[1], self.f_left[2],
+                    0.0, 0.0, 0.0  # torques if you don't have them mapped; else use self.f_left[3:6]
+                ])
+            self.last_log_t = t_now
+
+
+        if self.joint_positions is None:
+            q_dot = np.zeros(self.n, dtype=float)
+        # else:
+        #     error = abs(lam_star[0] - lam_meas[0])  # Fx-only
+        #     if error < self.deadband:
+        #         q_dot = np.zeros(self.n, dtype=float)
+        else:
+                force_error = lam_star_final - lam_meas
+                force_error[1] = 0.0
+                force_error[2] = 0.0
+                force_error[3:6] = 0.0
+                v_force = (0.01 * force_error) / self.k_vec
+
+                
+                v_obj = np.zeros(6)
+                v_obj[2] = self.obj_vel_x
+                
+                # copy so you don’t overwrite the raw v_obj
+                v_obj_scaled = v_obj.copy()
+
+                # scale only the lifting direction (z, index 2)
+                lift_scale = 0.2   # e.g. 20% of original speed
+                v_obj_scaled[2] *= lift_scale
+
+                # combine
+                v_c =  v_obj_scaled
+                v_final = v_force 
+
+
+                J = _kdl_jacobian(self.chain, self.jac_solver, self.joint_positions)
+                if J.shape == (6, self.n) and np.linalg.cond(J) < 1e4:
+                    q_dot = np.clip(np.linalg.pinv(J).dot(v_final),
+                                    -self.max_joint_vel, self.max_joint_vel)
+                else:
+                    q_dot = np.zeros(self.n, dtype=float)
+
+        self.pub.publish(Float64MultiArray(data=q_dot.tolist()))
+        self.f_n_cmd_prev = abs(lam_star_final[0])
+

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>addverb_cobot_controllers</name>
+  <version>0.0.0</version>
+  <description>This package provides the custom controllers - Twist controller and Joint Trajectory controller for running thr robot</description>
+
+  <maintainer email="siddhi.jain@addverb.com">Yaswanth Gonna</maintainer> 
+  <maintainer email="yaswanth.gonna@addverb.com">Yaswanth Gonna</maintainer>
+  <license>TODO</license>
+  <author>Siddhi Jain</author>
+  <author>Yaswanth Gonna</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>controller_interface</build_depend>
+  <build_depend>pluginlib</build_depend>
+
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>hardware_interface</build_depend>
+  <build_depend>realtime_tools</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>trajectory_msgs</build_depend>
+  <build_depend>actionlib</build_depend>
+  <build_depend>actionlib_msgs</build_depend>
+  <build_depend>control_msgs</build_depend>
+
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>hardware_interface</exec_depend>
+  <exec_depend>controller_interface</exec_depend>
+  <exec_depend>realtime_tools</exec_depend>
+  <exec_depend>pluginlib</exec_depend>
+  <exec_depend>trajectory_msgs</exec_depend>
+  <exec_depend>actionlib</exec_depend>
+  <exec_depend>actionlib_msgs</exec_depend>
+  <exec_depend>control_msgs</exec_depend>
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+     <controller_interface plugin="${prefix}/addverb_cobot_controllers_plugin.xml"/>
+  </export>
+</package>

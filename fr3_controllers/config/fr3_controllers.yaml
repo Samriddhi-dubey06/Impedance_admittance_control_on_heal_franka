@@ -1,0 +1,101 @@
+eoi_controller:
+    type: fr3_controllers/EOIController
+    arm_id: $(arg arm_id)
+    joint_names:
+        - $(arg arm_id)_joint1
+        - $(arg arm_id)_joint2
+        - $(arg arm_id)_joint3
+        - $(arg arm_id)_joint4
+        - $(arg arm_id)_joint5
+        - $(arg arm_id)_joint6
+        - $(arg arm_id)_joint7
+    delay_jacobian:   0
+    delay_cartesian:  0
+    noise_jacobian:   0.0
+    noise_cartesian:  0.0
+    K_y: 0.0
+
+joint_position_controller:
+  type: "fr3_controllers/JointPositionController"
+  arm_id: $(arg arm_id)
+
+joint_velocity_controller:
+    type: fr3_controllers/JointVelocityController
+    arm_id: $(arg arm_id)
+    joint_names:
+        - $(arg arm_id)_joint1
+        - $(arg arm_id)_joint2
+        - $(arg arm_id)_joint3
+        - $(arg arm_id)_joint4
+        - $(arg arm_id)_joint5
+        - $(arg arm_id)_joint6
+        - $(arg arm_id)_joint7
+
+vic_controller:
+    type: fr3_controllers/VIC
+    arm_id: $(arg arm_id)
+    joint_names:
+        - $(arg arm_id)_joint1
+        - $(arg arm_id)_joint2
+        - $(arg arm_id)_joint3
+        - $(arg arm_id)_joint4
+        - $(arg arm_id)_joint5
+        - $(arg arm_id)_joint6
+        - $(arg arm_id)_joint7
+
+joint_impedance_controller:
+    type: fr3_controllers/JointImpedanceController
+    arm_id: $(arg arm_id)
+    joint_names:
+        - $(arg arm_id)_joint1
+        - $(arg arm_id)_joint2
+        - $(arg arm_id)_joint3
+        - $(arg arm_id)_joint4
+        - $(arg arm_id)_joint5
+        - $(arg arm_id)_joint6
+        - $(arg arm_id)_joint7
+    k_gains:
+        - 50.0
+        - 50.0
+        - 50.0
+        - 50.0
+        - 50.0
+        - 50.0
+        - 50.0
+    d_gains:
+        - 20.0
+        - 20.0
+        - 20.0
+        - 20.0
+        - 20.0
+        - 20.0
+        - 20.0
+    radius: 0.1
+    acceleration_time: 2.0
+    vel_max: 0.15
+    publish_rate: 10.0
+    coriolis_factor: 1.0
+
+cartesian_impedance_controller:
+    type: fr3_controllers/CartesianImpedanceController
+    arm_id: $(arg arm_id)
+    joint_names:
+        - $(arg arm_id)_joint1
+        - $(arg arm_id)_joint2
+        - $(arg arm_id)_joint3
+        - $(arg arm_id)_joint4
+        - $(arg arm_id)_joint5
+        - $(arg arm_id)_joint6
+        - $(arg arm_id)_joint7
+
+dob:
+    type: fr3_controllers/DOB
+    arm_id: $(arg arm_id)
+    joint_names:
+        - $(arg arm_id)_joint1
+        - $(arg arm_id)_joint2
+        - $(arg arm_id)_joint3
+        - $(arg arm_id)_joint4
+        - $(arg arm_id)_joint5
+        - $(arg arm_id)_joint6
+        - $(arg arm_id)_joint7

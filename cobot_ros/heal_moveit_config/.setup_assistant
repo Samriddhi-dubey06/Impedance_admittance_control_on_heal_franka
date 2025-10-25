@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: addverb_heal_description
+    relative_path: urdf/robot.urdf
+    xacro_args: ""
+  SRDF:
+    relative_path: config/robot.srdf
+  CONFIG:
+    author_name: Debojit Das
+    author_email: personal@debojit.in
+    generated_timestamp: 1739112769

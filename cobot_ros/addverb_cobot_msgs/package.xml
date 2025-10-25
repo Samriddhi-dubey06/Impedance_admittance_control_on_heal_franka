@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>addverb_cobot_msgs</name>
+  <version>0.0.1</version>
+  <description>This package contains custom action files for actions of Grasp, Release and ErrorRecovery</description>
+
+  <maintainer email="siddhi.jain@addverb.com">Yaswanth Gonna</maintainer> 
+  <maintainer email="yaswanth.gonna@addverb.com">Yaswanth Gonna</maintainer>
+  <license>TODO</license>
+  <author>Siddhi Jain</author>
+  <author>Yaswanth Gonna</author>
+
+  <build_depend>message_generation</build_depend>
+  <build_export_depend>message_generation</build_export_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>trajectory_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>trajectory_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <export>
+  </export>
+</package>

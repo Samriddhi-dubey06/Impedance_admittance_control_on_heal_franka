@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>addverb_cobot_control</name>
+  <version>0.0.1</version>
+  <description>This package provides the hardware abstraction and communication interface to operate the robot via ROS</description>
+
+  <maintainer email="siddhi.jain@addverb.com">Yaswanth Gonna</maintainer> 
+  <maintainer email="yaswanth.gonna@addverb.com">Yaswanth Gonna</maintainer>
+  <license>TODO</license>
+  <author>Siddhi Jain</author>
+  <author>Yaswanth Gonna</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>addverb_cobot_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>actionlib</build_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>joint_limits_interface</build_depend>
+  <build_depend>addverb_cobot_controllers</build_depend>
+  
+  <exec_depend>addverb_cobot_msgs</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>actionlib</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>joint_limits_interface</exec_depend>
+  <exec_depend>addverb_cobot_controllers</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+
+  <export>
+  </export>
+</package>

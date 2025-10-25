@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- ================= FRANKA ROBOT (FR3) ONLY ================= -->
+  <group ns="fr3">
+    <!-- Arguments -->
+    <arg name="robot"        default="fr3"/>
+    <arg name="arm_id"       default="fr3"/>
+    <arg name="robot_ip"     default="192.168.1.11"/>
+    <arg name="load_gripper" default="true"/>
+    <arg name="tf_prefix"    default="fr3"/>
+
+    <!-- Launch velocity controller -->
+    <include file="$(find fr3_controllers)/launch/joint_velocity_controller.launch">
+      <arg name="robot"        value="$(arg robot)"/>
+      <arg name="arm_id"       value="$(arg arm_id)"/>
+      <arg name="robot_ip"     value="$(arg robot_ip)"/>
+      <arg name="load_gripper" value="$(arg load_gripper)"/>
+      <arg name="tf_prefix"    value="$(arg tf_prefix)"/>
+    </include>
+  </group>
+</launch>

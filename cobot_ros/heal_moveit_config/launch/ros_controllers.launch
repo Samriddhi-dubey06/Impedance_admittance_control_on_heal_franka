@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+   <rosparam file="$(find heal_moveit_config)/config/ros_controllers.yaml" command="load"/> 
+
+  <param name="moveit_controller_manager" value="moveit_simple_controller_manager/MoveItSimpleControllerManager" />
+
+  <!-- Load controller settings -->
+    <rosparam file="$(find addverb_cobot_control)/config/default_controllers.yaml" command="load"/>
+    <param name="robot_description" textfile="$(find addverb_heal_description)/urdf/robot.urdf"/>
+  
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+    <!-- temp ros param launch -->
+    <rosparam file="$(find addverb_cobot_control)/config/payload_param.yaml" command="load"/>
+     <param name="robot_namespace" value="robotA"/>
+
+  <!-- Load the controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+    output="screen" args="joint_state_controller velocity_controller joint_trajectory_controller"/>
+  
+  <node name="control_node" pkg="addverb_cobot_control" type="control_node" output="screen" />
+</launch>

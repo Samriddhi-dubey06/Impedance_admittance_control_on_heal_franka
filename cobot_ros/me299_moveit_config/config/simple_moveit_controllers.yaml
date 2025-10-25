@@ -1,0 +1,7 @@
+controller_list:
+  - name: heal_control
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: True
+    joints:
+      []

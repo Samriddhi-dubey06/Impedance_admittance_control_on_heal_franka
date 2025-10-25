@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- ================= HEAL ROBOT (Addverb) ================= -->
+  <group ns="heal">
+    <!-- tf_prefix ensures frame names are unique -->
+    <include file="$(find addverb_cobot_control)/launch/bringup.launch">
+      <arg name="namespace" value="robotA"/>
+      <arg name="tf_prefix" value="heal"/>
+    </include>
+  </group>
+
+  <!-- ================= FRANKA ROBOT (FR3) ================= -->
+  <group ns="fr3">
+    <arg name="robot"        value="fr3"/>
+    <arg name="arm_id"       value="fr3"/>
+    <arg name="robot_ip"     value="192.168.1.11"/>
+    <arg name="load_gripper" value="true"/>
+    <arg name="tf_prefix"    value="fr3"/>
+
+    <include file="$(find fr3_controllers)/launch/joint_velocity_controller.launch">
+      <arg name="robot"        value="$(arg robot)"/>
+      <arg name="arm_id"       value="$(arg arm_id)"/>
+      <arg name="robot_ip"     value="$(arg robot_ip)"/>
+      <arg name="load_gripper" value="$(arg load_gripper)"/>
+      <arg name="tf_prefix"    value="$(arg tf_prefix)"/>
+    </include>
+  </group>
+
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="heal_to_franka"
+        args="0.5 0 0 0 0 0 robotA/base_link fr3/fr3_link0" />
+
+  <node name="rviz" pkg="rviz" type="rviz"
+      args="-d $(find ds_control)/launch/rviz/bimanual.rviz"
+      output="screen" /> -->
+  <!-- <node pkg="snap_detector" type="snap_detector_node.py" name="snap_detector" output="screen"/> -->
+
+</launch>

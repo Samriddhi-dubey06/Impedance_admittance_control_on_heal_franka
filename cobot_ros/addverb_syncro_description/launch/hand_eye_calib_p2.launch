@@ -1,0 +1,32 @@
+<launch>
+  <!-- Argument for the RViz config file -->
+  <arg name="rviz_config" default="$(find addverb_cobot_description)/config/hec_dual_arm.config.rviz" />
+
+  <!-- Include the RealSense camera launch file -->
+  <include ns="/" file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <arg name="enable_color" value="true" />
+    <arg name="enable_depth" value="true" />
+    <arg name="enable_infra1" value="true" />
+    <arg name="enable_infra2" value="true" />
+    <arg name="initial_reset" value="true" />
+  </include>
+
+  <!-- Apply a 180-degree rotation to the camera -->
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="camera_rotation"
+      args="0 0 0 1 0 0 0 camera_link camera_link_rotated" /> -->
+
+  <!-- Add the image_rotate node -->
+  <node ns="/" pkg="image_rotate" type="image_rotate" name="image_rotate_node" output="screen">
+    <param name="angle" value="3.14159" /> 
+    <remap from="image" to="/camera/color/image_raw" /> 
+    <remap from="rotated/image" to="/camera/color/image_rotated" />
+  </node>
+
+
+  <!-- Publish a static transform: robotB/base_link w.r.t. robotA/base_link -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="robotA_to_robotB_broadcaster"
+        args="-1.48 0 -0.02 0 0 1 0 robotB/base_link robotA/base_link" />
+
+  <!-- Launch RViz with the specified config -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_config)" />
+</launch>

@@ -1,0 +1,18 @@
+# payload properties
+# flag to indicate payload attachment status [possible values : true/false]
+payload_attached: false
+# integer representing which gripper is attached [possible values : @todo]
+gripper_type: 1
+# mass of payload in kg   
+mass: 0.1 
+# COM in metres
+comx: 0.01 
+comy: 0.01
+comz: 0.01
+# MOI in kg-m^2 
+Ixx: 0.0005
+Iyy: 0.0005
+Izz: 0.0005
+Ixy: 0
+Ixz: 0
+Iyz: 0

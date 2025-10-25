@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<launch>
+  <!-- Package containing the scripts -->
+  <arg name="pkg" default="fr3_controllers"/>
+
+  <!-- Choose which aruco velocity node variant to run (same file, two init styles). 
+       By default, we run the __main__ version with node name 'pose_transformer'. -->
+  <arg name="use_aruco_pose_transformer" default="true"/>
+  <arg name="use_aruco_velocity_from_transform" default="false"/>
+
+  <!-- 1) utils/auruco_obj_velocity.py  -->
+  <group>
+    <!-- If you use the __main__ version -->
+    <node if="$(arg use_aruco_pose_transformer)"
+          pkg="$(arg pkg)"
+          type="dynamic_box_lifting/data_for_ee_force/utils/auruco_obj_position.py"
+          name="pose_transformer"
+          output="screen"
+          cwd="node" />
+
+    <!-- If you instead use the main() version -->
+    <node if="$(arg use_aruco_velocity_from_transform)"
+          pkg="$(arg pkg)"
+          type="dynamic_box_lifting/data_for_ee_force/utils/auruco_obj_velocity.py"
+          name="current_velocity_from_transformed_pos"
+          output="screen"
+          cwd="node" />
+  </group>
+
+  <!-- 3) scripts/fr3_wrench_filter.py -->
+  <node pkg="$(arg pkg)"
+        type="dynamic_box_lifting/data_for_ee_force/scripts/fr3_wrench_filter.py"
+        name="fr3_wrench_filter"
+        output="screen"
+        cwd="node" />
+
+  <!-- 4) scripts/ft_raw_values.py -->
+  <node pkg="$(arg pkg)"
+        type="dynamic_box_lifting/data_for_ee_force/scripts/ft_raw_values.py"
+        name="robotous_ft_publisher"
+        output="screen"
+        cwd="node" />
+
+  <!-- 5) utils/wrench.py -->
+  <node pkg="$(arg pkg)"
+        type="dynamic_box_lifting/data_for_ee_force/utils/wrench.py"
+        name="wrench_aggregator"
+        output="screen"
+        cwd="node" />
+</launch>

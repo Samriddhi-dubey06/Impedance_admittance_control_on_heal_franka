@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="medical_robot_v1_R2">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="9.6595E-07 2.2406E-05 0.022616"
+        rpy="0 0 0" />
+      <mass
+        value="3.839" />
+      <inertia
+        ixx="0.01337"
+        ixy="2.1124E-06"
+        ixz="3.5547E-06"
+        iyy="0.013374"
+        iyz="7.0309E-06"
+        izz="0.022707" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="link1">
+    <inertial>
+      <origin
+        xyz="-0.012435 -2.5345E-05 0.28172"
+        rpy="0 0 0" />
+      <mass
+        value="5.0617" />
+      <inertia
+        ixx="0.011934"
+        ixy="-4.2772E-06"
+        ixz="0.0016521"
+        iyy="0.011427"
+        iyz="3.2849E-06"
+        izz="0.0091785" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/link1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/link1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_1"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="link1" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1"
+      upper="1"
+      effort="150"
+      velocity="2" />
+  </joint>
+  <link
+    name="link2">
+    <inertial>
+      <origin
+        xyz="-0.10679 3.7919E-06 0.15236"
+        rpy="0 0 0" />
+      <mass
+        value="1.2353" />
+      <inertia
+        ixx="0.0057954"
+        ixy="3.2114E-08"
+        ixz="3.5658E-06"
+        iyy="0.0048706"
+        iyz="-6.4438E-07"
+        izz="0.0016259" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/link2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/link2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_2"
+    type="revolute">
+    <origin
+      xyz="0 0 0.346"
+      rpy="0 0 0" />
+    <parent
+      link="link1" />
+    <child
+      link="link2" />
+    <axis
+      xyz="-1 0 0" />
+    <limit
+      lower="-0.30"
+      upper="2.05"
+      effort="150"
+      velocity="2" />
+  </joint>
+  <link
+    name="link3">
+    <inertial>
+      <origin
+        xyz="-0.017248 0.035025 -2.2087E-05"
+        rpy="0 0 0" />
+      <mass
+        value="3.5577" />
+      <inertia
+        ixx="0.0066247"
+        ixy="-0.00095453"
+        ixz="1.793E-06"
+        iyy="0.0050017"
+        iyz="1.7882E-06"
+        izz="0.0060636" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/link3.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/link3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_3"
+    type="revolute">
+    <origin
+      xyz="0 0 0.305"
+      rpy="0 0 0" />
+    <parent
+      link="link2" />
+    <child
+      link="link3" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-1.57"
+      upper="0.9"
+      effort="150"
+      velocity="2" />
+  </joint>
+  <link
+    name="link4">
+    <inertial>
+      <origin
+        xyz="-0.047999 -0.10939 4.4809E-05"
+        rpy="0 0 0" />
+      <mass
+        value="1.31" />
+      <inertia
+        ixx="0.0014749"
+        ixy="0.00050231"
+        ixz="1.7564E-06"
+        iyy="0.0016894"
+        iyz="-1.9993E-06"
+        izz="0.0017778" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/link4.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/link4.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_4"
+    type="revolute">
+    <origin
+      xyz="-0.0009127 0.36813 0"
+      rpy="0 0 0" />
+    <parent
+      link="link3" />
+    <child
+      link="link4" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-1.4"
+      upper="1.4"
+      effort="80"
+      velocity="2" />
+  </joint>
+  <link
+    name="link5">
+    <inertial>
+      <origin
+        xyz="-0.0015193 -0.0027725 -0.044032"
+        rpy="0 0 0" />
+      <mass
+        value="1.1965" />
+      <inertia
+        ixx="0.0010777"
+        ixy="-3.7989E-05"
+        ixz="2.9305E-05"
+        iyy="0.0010311"
+        iyz="4.9507E-05"
+        izz="0.0013412" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/link5.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/link5.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_5"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="link4" />
+    <child
+      link="link5" />
+    <axis
+      xyz="0.5 0.86603 0" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="80"
+      velocity="2" />
+  </joint>
+  <link
+    name="end-effector">
+    <inertial>
+      <origin
+        xyz="-0.018484 -0.3079 -0.15412"
+        rpy="0 0 0" />
+      <mass
+        value="2.348" />
+      <inertia
+        ixx="1.629"
+        ixy="0.0010369"
+        ixz="0.057914"
+        iyy="1.3338"
+        iyz="-0.30823"
+        izz="0.38146" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/end-effector.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://addverb_cobot_description/meshes/end-effector.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_6"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.0975"
+      rpy="0 0 0" />
+    <parent
+      link="link5" />
+    <child
+      link="end-effector" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      lower="-3.14"
+      upper="3.14"
+      effort="80"
+      velocity="2" />
+  </joint>
+</robot>

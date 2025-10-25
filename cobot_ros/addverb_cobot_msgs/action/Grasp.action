@@ -1,0 +1,10 @@
+# goal 
+float64 grasp_force
+---
+# result
+int32 state
+int32 error_code
+string error_msg
+---
+# feedback
+int32 state

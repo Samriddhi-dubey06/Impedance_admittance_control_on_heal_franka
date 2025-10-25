@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Define a namespace argument -->
+    <arg name="namespace" default="robotA"/>
+
+    <!-- Load URDF into the parameter server -->
+    <param name="robot_description" command="cat $(find addverb_heal_description)/urdf/robot.urdf" />
+
+    <param name="robot_description_semantic" textfile="$(find heal_moveit_config)/config/robot.srdf" /> 
+
+    <!-- Load controller settings -->
+    <rosparam file="$(find addverb_cobot_control)/config/default_controllers.yaml" command="load" />
+
+    <!-- Load payload parameters -->
+    <rosparam file="$(find addverb_cobot_control)/config/payload_param.yaml" command="load" />
+
+    <!-- Publish param with key "robot_namespace" and value of arg "namespace" -->
+    <param name="robot_namespace" value="$(arg namespace)"/>
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <param name="tf_prefix" value="$(arg namespace)" />
+    </node>
+
+    <!-- Load controller manager -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+        args="joint_state_controller velocity_controller twist_controller joint_trajectory_controller" />
+
+    <node name="control_node" pkg="addverb_cobot_control" type="control_node" required="true" respawn="false" output="screen" />
+
+    <!-- End-effector publisher node -->
+    <node name="end_effector_publisher" pkg="addverb_heal_data_broadcaster" type="end_effector_publisher.py" output="screen"/>
+
+    <!-- Include RealSense camera launch -->
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+        <arg name="enable_pointcloud" value="true"/>
+    </include>
+
+    <!-- Launch MoveIt! and RViz -->
+    <include file="$(find me299_moveit_config)/launch/demo.launch">
+        <arg name="use_rviz" value="true"/>
+    </include>
+
+    <!-- Launch RViz with a specific config file -->
+    <node name="rviz" pkg="rviz" type="rviz" required="true" output="screen" args="-d /home/pikapika/Debojit_WS/Addverb_Heal_and_Syncro_Hardware/src/cobot_ros/addverb_cobot_control/config/your_rviz_config.rviz" />
+
+</launch>

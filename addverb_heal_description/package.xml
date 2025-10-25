@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>addverb_heal_description</name>
+  <version>0.0.1</version>
+  <description>This package contains the description of the Robot in URDF format</description>
+
+  <maintainer email="siddhi.jain@addverb.com">Yaswanth Gonna</maintainer> 
+  <maintainer email="yaswanth.gonna@addverb.com">Yaswanth Gonna</maintainer>
+  <license>TODO</license>
+  <author>Siddhi Jain</author>
+  <author>Yaswanth Gonna</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>joint_state_publisher_gui</exec_depend>
+
+  <export>
+  </export>
+</package>

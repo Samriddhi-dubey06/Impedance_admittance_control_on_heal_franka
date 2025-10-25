@@ -1,0 +1,13 @@
+controller_list:
+  - name: fake_syncro_arm_controller
+    type: $(arg fake_execution_type)
+    joints:
+      - Joint_1
+      - Joint_2
+      - Joint_3
+      - Joint_4
+      - Joint_5
+      - Joint_6
+initial:  # Define initial robot poses per group
+  - group: syncro_arm
+    pose: home

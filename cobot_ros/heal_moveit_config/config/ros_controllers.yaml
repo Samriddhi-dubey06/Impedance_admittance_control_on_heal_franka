@@ -1,0 +1,10 @@
+velocity_controller:
+   type: velocity_controllers/JointGroupVelocityController
+   # These joints can likely just be copied from the hardware_interface list above
+   joints:
+      - Joint_1
+      - Joint_2
+      - Joint_3
+      - Joint_4
+      - Joint_5
+      - Joint_6

@@ -1,0 +1,38 @@
+Script started on 2025-07-28 03:13:57+05:30 [TERM="xterm-256color" TTY="/dev/pts/5" COLUMNS="113" LINES="10"]
+]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector[00m$ s[Kcd scripts/
+]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector/scripts[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector/scripts[00m$ ls
+[0m[01;32msnap_detector_node.py[0m
+]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector/scripts[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector/scripts[00m$ python [K snap_detector_node.py 
+Traceback (most recent call last):
+  File "snap_detector_node.py", line 8, in <module>
+    from snap_detector.snapnet import SnapDetectorNet
+ModuleNotFoundError: No module named 'snap_detector'
+]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector/scripts[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector/scripts[00m$ python snap_detector_node.py 
+[INFO] [1753653077.652903]: Snap Detector Node Initialized
+^C]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector/scripts[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector/scripts[00m$ python snap_detector_node.py 
+[INFO] [1753653334.425202]: Snap Detector Node Initialized
+^C]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector/scripts[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector/scripts[00m$ ^C
+]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector/scripts[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector/scripts[00m$ ^C
+]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector/scripts[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector/scripts[00m$ python snap_detector_node.py 
+[INFO] [1753694759.474503]: Snap Detector Node Initialized
+^C]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector/scripts[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector/scripts[00m$ python snap_detector_node.py 
+[INFO] [1753695242.890578]: Snap Detector Node Initialized
+^C]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector/scripts[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector/scripts[00m$ python snap_detector_node.py 
+[INFO] [1753695469.144975]: Snap Detector Node Initialized
+^C]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector/scripts[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector/scripts[00m$ python snap_detector_node.py 
+[INFO] [1753700383.352077]: Snap Detector Node Initialized
+^C]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector/scripts[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector/scripts[00m$ python snap_detector_node.py 
+Unable to register with master node [http://127.0.0.1:11311]: master may not be running yet. Will keep trying.
+^C^C^CTraceback (most recent call last):
+  File "snap_detector_node.py", line 67, in <module>
+    main()
+  File "snap_detector_node.py", line 62, in main
+    rospy.init_node("snap_detector_node")
+  File "/opt/ros/noetic/lib/python3/dist-packages/rospy/client.py", line 336, in init_node
+    raise rospy.exceptions.ROSInitException("Failed to initialize time. Please check logs for additional details")
+rospy.exceptions.ROSInitException: Failed to initialize time. Please check logs for additional details
+^C
+]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector/scripts[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector/scripts[00m$ python snap_detector_node.py 
+[INFO] [1753700998.226300]: Snap Detector Node Initialized
+^C]0;iitgn-robotics@ROBO: ~/ds_yash/bimanual_ws/src/snap_detector/scripts[01;32miitgn-robotics@ROBO[00m:[01;34m~/ds_yash/bimanual_ws/src/snap_detector/scripts[00m$ python snap_detector_node.py 
+[INF

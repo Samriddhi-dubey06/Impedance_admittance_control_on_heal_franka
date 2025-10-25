@@ -1,0 +1,9 @@
+<launch>
+  <!-- Launch the move_group node -->
+  <include file="$(find syncro_moveit_config)/launch/move_group.launch" />
+
+  <!-- Wait for move_group and launch dependent nodes -->
+  <node pkg="addverb_cobot_description" type="delayed_launch.py" name="delayed_launch" output="screen">
+    <param name="dependent_launch" value="$(find addverb_cobot_description)/launch/hand_eye_calib_p2.launch" />
+  </node>
+</launch>

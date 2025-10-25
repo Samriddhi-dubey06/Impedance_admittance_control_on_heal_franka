@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<launch>
+  <!-- Arguments (optional to change from command line) -->
+  <arg name="robot" default="fr3"/>
+  <arg name="arm_id" default="$(arg robot)"/>
+
+  <!-- Bringup robot -->
+  <include file="$(find franka_control)/launch/franka_control.launch" pass_all_args="true"/>
+
+  <!-- Load both controllers but don't start them -->
+  <rosparam command="load" file="$(find fr3_controllers)/config/fr3_controllers.yaml" subst_value="true"/>
+  <node pkg="controller_manager" type="spawner" name="controller_spawner"
+        args="eoi_controller cartesian_pose_controller --stopped" output="screen"/>
+
+  <!-- Launch trial manager node (runs 100 trials) -->
+  <node pkg="fr3_controllers" type="trial_manager.py" name="trial_manager"
+        output="screen"/>
+</launch>
