@@ -1,6 +1,6 @@
 Impedance–Admittance Control on Heal Franka
 
-This repository contains the implementation of impedance and admittance control strategies on the Heal dual-arm robotic platform equipped with Franka Emika Panda manipulators. The work focuses on achieving compliant and adaptive interaction behaviors for physical human–robot and robot–environment interactions. This project is part of the research submitted to the International Conference on Technological Advancements (ICTA) and also forms the basis of a paper submitted to ICRA.
+This repository contains the implementation of impedance and admittance control strategies on the Heal dual-arm robotic platform equipped with Franka Emika Panda manipulators. The work focuses on achieving compliant and adaptive interaction behaviors for physical human–robot and robot–environment interactions. This project is part of the research submitted to the  (ICRA) .
 
 Overview
 
